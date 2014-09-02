@@ -28,6 +28,18 @@ int main()
 	// Initialize Windows socket library
 	WSAStartup(0x0202, &wsaData);
 
+	// 获取本地主机名和 IP，注意一定要放在 WSAStartup() 之后处理
+	char hostname[128]; 
+	if( gethostname(hostname,128)==0 ) 
+	{ 
+		printf("%s\n",hostname);//计算机名字
+	}
+	struct hostent *pHost = gethostbyname(hostname); 
+	for (int i = 0; pHost != NULL && pHost->h_addr_list[i] != NULL; ++i) 
+	{
+		printf(  "%s\n", inet_ntoa( *(struct in_addr *)pHost->h_addr_list[i] )  ); 
+	} 
+
 	// Create listening socket
 	sListen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -36,7 +48,7 @@ int main()
 	local.sin_family = AF_INET;
 	local.sin_port = htons(PORT);
 	bind( sListen, (struct sockaddr *)&local, sizeof(SOCKADDR_IN) );
-	printf( "The Server Address :  %s:%d", inet_ntoa(local.sin_addr), ntohs(local.sin_port) );
+	printf( "The Server Address :  %s:%d\n", inet_ntoa(local.sin_addr), ntohs(local.sin_port) );
 
 	// Listen
 	listen(sListen, 3);
